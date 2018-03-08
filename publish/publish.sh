@@ -23,6 +23,12 @@ echo "The latest adapt release version is ${VERSION}"
 # check out tagged version
 git checkout release/v${VERSION}
 
+# create virtualenv
+echo "Creating virtualenv"
+virtualenv ${VIRTUALENV_ROOT}
+# activate virtualenv
+. ${VIRTUALENV_ROOT}/bin/activate
+
 # get setup.py version
 PYPI_VERSION=$(python ${TOP}/setup.py --version)
 echo "The adapt version found in setup.py is ${PYPI_VERSION}"
@@ -30,12 +36,6 @@ echo "The adapt version found in setup.py is ${PYPI_VERSION}"
 # clean virtualenv and remove previous test results
 echo "Removing previous virtualenv and test results if they exist"
 rm -rf ${VIRTUALENV_ROOT} TEST-*.xml
-
-# create virtualenv
-echo "Creating virtualenv"
-virtualenv ${VIRTUALENV_ROOT}
-# activate virtualenv
-. ${VIRTUALENV_ROOT}/bin/activate
 
 # verify release tag and setup.py version are equal
 if [[ ${VERSION} != ${PYPI_VERSION} ]]; then
