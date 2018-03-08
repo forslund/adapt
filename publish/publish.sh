@@ -13,6 +13,7 @@ TOP=$(cd $(dirname $0)/.. && pwd -L)
 echo "The working directory top is ${TOP}"
 
 # set virtualenv root
+SETUP_VIRTUALENV="${HOME}/.virtualenvs/adapt-setup"
 VIRTUALENV_ROOT=${VIRTUALENV_ROOT:-"${HOME}/.virtualenvs/adapt"}
 echo "The virtualenv root location is ${VIRTUALENV_ROOT}"
 
@@ -24,10 +25,12 @@ echo "The latest adapt release version is ${VERSION}"
 git checkout release/v${VERSION}
 
 # create virtualenv
-echo "Creating virtualenv"
-virtualenv ${VIRTUALENV_ROOT}
-# activate virtualenv
-. ${VIRTUALENV_ROOT}/bin/activate
+if [ ! -d ${SETUP_VIRTUALENV} ]; then
+    echo "Creating virtualenv"
+    virtualenv ${SETUP_VIRTUALENV}
+fi
+# activate setup virtualenv
+. ${SETUP_VIRTUALENV}/bin/activate
 
 # get setup.py version
 PYPI_VERSION=$(python ${TOP}/setup.py --version)
@@ -45,6 +48,11 @@ if [[ ${VERSION} != ${PYPI_VERSION} ]]; then
 
 fi
 
+# create test virtualenv
+echo "Creating virtualenv"
+virtualenv ${VIRTUALENV_ROOT}
+# activate virtualenv
+. ${VIRTUALENV_ROOT}/bin/activate
 
 echo "Installing adapt requirements.txt"
 # install adapt requirements
