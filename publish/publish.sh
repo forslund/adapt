@@ -27,14 +27,6 @@ git checkout release/v${VERSION}
 PYPI_VERSION=$(python ${TOP}/setup.py --version)
 echo "The adapt version found in setup.py is ${PYPI_VERSION}"
 
-# verify release tag and setup.py version are equal
-if [[ ${VERSION} != ${PYPI_VERSION} ]]; then
-  echo "setup.py and release tag version are inconsistent."
-  echo "please update setup.py and verify release"
-  exit 1
-
-fi
-
 # clean virtualenv and remove previous test results
 echo "Removing previous virtualenv and test results if they exist"
 rm -rf ${VIRTUALENV_ROOT} TEST-*.xml
@@ -44,6 +36,15 @@ echo "Creating virtualenv"
 virtualenv ${VIRTUALENV_ROOT}
 # activate virtualenv
 . ${VIRTUALENV_ROOT}/bin/activate
+
+# verify release tag and setup.py version are equal
+if [[ ${VERSION} != ${PYPI_VERSION} ]]; then
+  echo "setup.py and release tag version are inconsistent."
+  echo "please update setup.py and verify release"
+  exit 1
+
+fi
+
 
 echo "Installing adapt requirements.txt"
 # install adapt requirements
@@ -75,10 +76,10 @@ replace ${PYPIRC_FILE} %%TESTPYPI_PASSWORD%% ${TESTPYPI_PASSWORD}
 # make .pyric private
 chmod -v 600 ${PYPIRC_FILE}
 
-echo "Registering at pypitest.python.org"
-python setup.py register -r pypitest
-echo "Uploading to pypitest.python.org"
-python setup.py sdist upload -r pypitest
+#echo "Registering at pypitest.python.org"
+#python setup.py register -r pypitest
+#echo "Uploading to pypitest.python.org"
+#python setup.py sdist upload -r pypitest
 
 echo "testing installation from testpypi.python.org"
 PYPI_TEST_VIRTUALENV='/tmp/.virtualenv'
@@ -92,7 +93,7 @@ deactivate
 rm -Rvf ${PYPI_TEST_VIRTUALENV}
 
 . ${VIRTUALENV_ROOT}/bin/activate
-echo "Registering at pypi.python.org"
-python setup.py register -r pypi
-echo "Uploading to pypi.python.org"
-python setup.py sdist upload -r pypi
+#echo "Registering at pypi.python.org"
+#python setup.py register -r pypi
+#echo "Uploading to pypi.python.org"
+#python setup.py sdist upload -r pypi
