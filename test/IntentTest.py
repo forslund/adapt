@@ -90,6 +90,49 @@ class IntentTest(unittest.TestCase):
             assert result_intent.get('Play Verb') == 'play'
             assert result_intent.get('series') == "the big bang theory"
 
+    def test_intent_with_regex_entity2(self):
+        self.trie = Trie()
+        self.tagger = EntityTagger(self.trie, self.tokenizer, self.regex_entities)
+        self.parser = Parser(self.tokenizer, self.tagger)
+        self.trie.insert("world time", ("world time", "WorldTime"))
+        regex = re.compile(r"(for|at|in|on) (?P<CityName>.+)")
+        self.regex_entities.append(regex)
+        intent = IntentBuilder("mock intent")\
+            .require("CityName")\
+            .require("WorldTime").build()
+
+        for result in self.parser.parse("show world time for Stockholm"):
+            result_intent = intent.validate(result.get('tags'), result.get('confidence'))
+            assert result_intent.get('confidence') > 0.0
+            assert result_intent.get('CityName') == 'stockholm'
+            assert result_intent.get('WorldTime') == "world time"
+
+        for result in self.parser.parse("show world time on TV"):
+            result_intent = intent.validate(result.get('tags'), result.get('confidence'))
+            assert result_intent.get('confidence') > 0.0
+            assert result_intent.get('CityName') == 'tv'
+            assert result_intent.get('WorldTime') == "world time"
+
+        for result in self.parser.parse("show world time at times square"):
+            result_intent = intent.validate(result.get('tags'), result.get('confidence'))
+            print result_intent
+            assert result_intent.get('confidence') > 0.0
+            assert result_intent.get('CityName') == 'times square'
+            assert result_intent.get('WorldTime') == "world time"
+
+        for result in self.parser.parse("show world time in Los Angeles"):
+            result_intent = intent.validate(result.get('tags'), result.get('confidence'))
+            assert result_intent.get('confidence') > 0.0
+            assert result_intent.get('CityName') == 'los angeles'
+            assert result_intent.get('WorldTime') == "world time"
+
+        self.trie.insert("for", ("for", "Failure"))
+        for result in self.parser.parse("show world time for Stockholm"):
+            result_intent = intent.validate(result.get('tags'), result.get('confidence'))
+            assert result_intent.get('confidence') > 0.0
+            assert result_intent.get('CityName') == 'stockholm'
+            assert result_intent.get('WorldTime') == "world time"
+
     def test_intent_with_regex_entity(self):
         self.trie = Trie()
         self.tagger = EntityTagger(self.trie, self.tokenizer, self.regex_entities)
