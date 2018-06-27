@@ -84,10 +84,10 @@ replace ${PYPIRC_FILE} %%TESTPYPI_PASSWORD%% ${TESTPYPI_PASSWORD}
 # make .pyric private
 chmod -v 600 ${PYPIRC_FILE}
 
-#echo "Registering at pypitest.python.org"
-#python setup.py register -r pypitest
-#echo "Uploading to pypitest.python.org"
-#python setup.py sdist upload -r pypitest
+echo "Registering at test.pypi.org"
+python setup.py register -r pypitest
+echo "Uploading to test.pypi.org"
+python setup.py sdist upload -r pypitest
 
 echo "testing installation from testpypi.python.org"
 PYPI_TEST_VIRTUALENV='/tmp/.virtualenv'
@@ -96,7 +96,7 @@ virtualenv ${PYPI_TEST_VIRTUALENV}
 deactivate
 . ${PYPI_TEST_VIRTUALENV}/bin/activate
 pip install -r requirements.txt
-pip install -i https://testpypi.python.org/pypi adapt-parser==${VERSION}
+pip install -i https://test.pypi.org/simple adapt-parser==${VERSION}
 deactivate
 rm -Rvf ${PYPI_TEST_VIRTUALENV}
 
